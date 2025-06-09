@@ -1,35 +1,18 @@
-import os
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
 import base64
-import pickle
-import numpy as np
 from io import BytesIO
 from PIL import Image
-import requests
+import numpy as np
+import pickle
 from keras.models import load_model
 from keras.preprocessing import image
 from tensorflow.keras.applications.inception_v3 import preprocess_input
 
-# Path in serverless temp folder
-MODEL_PATH = "/tmp/feature_extractor.keras"
+app = FastAPI()
 
-# Your public file URL (Google Drive direct download or Hugging Face URL)
-FEATURE_EXTRACTOR_URL = "https://drive.google.com/uc?id=1Z73ZnT3v7f3bqzB9jP5W2q5r34IT-VBw"
-
-
-
-
-# Download model if not exists
-def download_model():
-    if not os.path.exists(MODEL_PATH):
-        r = requests.get(FEATURE_EXTRACTOR_URL, stream=True)
-        with open(MODEL_PATH, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-    return MODEL_PATH
-
-# Load models
-feature_model = load_model(download_model())  # from /tmp
+# Load models and tokenizer once
+feature_model = load_model("feature_extractor.keras")
 caption_model = load_model("model.keras")
 with open("tokenizer.pkl", "rb") as f:
     tokenizer = pickle.load(f)
@@ -58,19 +41,13 @@ def generate_caption(photo):
         in_text += " " + word
     return in_text.replace("startseq", "").strip()
 
-def handler(request):
-    try:
-        body = request.json()
-        img_data = base64.b64decode(body['image'])
-        img = Image.open(BytesIO(img_data)).convert("RGB")
-        features = extract_features(img)
-        caption = generate_caption(features)
-        return {
-            "statusCode": 200,
-            "body": {"caption": caption}
-        }
-    except Exception as e:
-        return {
-            "statusCode": 500,
-            "body": {"error": str(e)}
-        }
+class ImageData(BaseModel):
+    image: str  # base64 string
+
+@app.post("/caption")
+async def caption_endpoint(data: ImageData):
+    img_data = base64.b64decode(data.image)
+    img = Image.open(BytesIO(img_data)).convert("RGB")
+    features = extract_features(img)
+    caption = generate_caption(features)
+    return {"caption": caption}
