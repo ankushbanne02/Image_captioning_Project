@@ -7,6 +7,7 @@ import os
 import numpy as np
 import pickle
 import requests
+import gdown
 
 from keras.models import load_model
 from keras.preprocessing import image
@@ -20,11 +21,11 @@ MODEL_ID = "1nUGeJRVN52HjwEUIVrRiloxETRgP_kGi"
 TOKENIZER_ID = "1u0lZ-RTN8dt9zf6iQYAHQMn4Ii8RkLx5"
 
 # === DOWNLOAD FUNCTION ===
+
+
 def download_from_drive(file_id, dest_path):
-    url = f"https://drive.google.com/uc?id={file_id}&export=download"
-    response = requests.get(url, allow_redirects=True)
-    with open(dest_path, 'wb') as f:
-        f.write(response.content)
+    url = f"https://drive.google.com/uc?id={file_id}"
+    gdown.download(url, dest_path, quiet=False)
 
 # === DOWNLOAD MODEL FILES AT STARTUP ===
 if not os.path.exists("feature_extractor.keras"):
