@@ -1,6 +1,0 @@
-fastapi
-uvicorn
-tensorflow
-keras
-pillow
-numpy
