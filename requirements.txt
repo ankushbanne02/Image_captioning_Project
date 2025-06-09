@@ -1,6 +1,8 @@
 fastapi
 uvicorn
-tensorflow
-keras
 pillow
 numpy
+tensorflow-cpu==2.13.0
+keras==2.13.1
+scikit-learn
+requests
