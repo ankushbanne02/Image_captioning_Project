@@ -20,8 +20,6 @@ FEATURE_EXTRACTOR_ID = "1Z73ZnT3v7f3bqzB9jP5W2q5r34IT-VBw"
 MODEL_ID = "1nUGeJRVN52HjwEUIVrRiloxETRgP_kGi"
 TOKENIZER_ID = "1u0lZ-RTN8dt9zf6iQYAHQMn4Ii8RkLx5"
 
-# === DOWNLOAD FUNCTION ===
-
 
 def download_from_drive(file_id, dest_path):
     url = f"https://drive.google.com/uc?id={file_id}"
